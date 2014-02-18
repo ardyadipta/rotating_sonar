@@ -7,7 +7,8 @@ Expansions:
 - Make this works with 4 sonar sensors
 - Able to scan within 360 degrees
 
-Author: Ardya Dipta Nandaviri
+Author: Ardya Dipta Nandaviri (ardyadipta@gmail.com)
+Last Updated: August 2010
 
 */
 
