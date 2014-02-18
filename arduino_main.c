@@ -1,31 +1,43 @@
+/*
+Arduino Code for Rotating Sonar Sensor Project
+This project is the expansion from LuckyLarry
+http://luckylarry.co.uk/arduino-projects/arduino-processing-make-a-radar-screen-part-3-visualising-the-data-from-sharp-infrared-range-finder/
+
+Expansions:
+- Make this works with 4 sonar sensors
+- Able to scan within 360 degrees
+
+Author: Ardya Dipta Nandaviri
+
+*/
+
 #define TIMER_US_PER_TICK 4 // 16MHz / 64 cycles per tick
 #define TIMER_OVERFLOW_US TIMER_US_PER_TICK * 65536 // timer1 16bit
-#define SUHU 28 //mendefinisikan nilai suhu untuk perhitungan kecepatan suara
+#define SUHU 28 // Define the temperature in degree of celcius
 
-//#define CM_PER_SEC 34792//pada suhu 27 derajat, rumusnya V = (33145 + 61*Tc)cm/s //34000
+//#define CM_PER_SEC 34792//at 27 degree of celcius, the formula is V = (33145 + 61*Tc)cm/s //34000
 
-////////// variabel untuk servo
+////////// Servo variable
 #include <Servo.h>            // include standard servo library
-Servo leftRightServo;         // buat variabel untuk mendefinisikan sebuah servo
+Servo leftRightServo;         // Define object leftRightServo
 int pos = 0;//servo position
 
-/////////////////////////////
-// variabel PING
+
+// vdefine PING Sensor variable
 
 volatile long ofStart[] = {0,0,0,0};
 volatile long timerStart[] = {0,0,0,0};// = [0,0];
 volatile long ultrasoundValue[] = {0,0,0,0}; // = [0,0];
 int val[] = {0,0,0,0};
 boolean done_PING[] = {false, false, false, false};
-//variabel untuk memastikan apakah sensor PING sudah selesai bekerja atau belum
-const int pingSig[] = {46,47,48,49} ; // pin SIG pada sensor PING)))
-long cm[] = {0,0,0,0};// variabel untuk nilai sensor
-long offset[] = {8,8,8,7};// offset untuk sensor, berdasarkan percobaan, sensor 4 diberikan offset -1. 
-//jarak dari pusat robot ke ujung sensor (jarak 0 sensor) adalah 8 cm, jadi masing-masing sensor diberikan offset 8 cm kecuali sensor 4, karena dia diberikan offset -1 juga.
+//Variable for flag whether the PING sensor has done sending signal or not
+const int pingSig[] = {46,47,48,49} ; // pin SIG for PING sensors
+long cm[] = {0,0,0,0};// Sensor values
+long offset[] = {8,8,8,7};// Sensor offset based on experiment
+// Distance from the robot to the end of the sensor is 8cm. 
 
-volatile int timer1_overflow = 0; //variabel pencacah berapa kali timer 1 sudah overflow, diberikan tipe volatile karena data dalam tipe ini disimpan dalam RAM, bukan dalam register, hal ini supaya nilainya tidak terganggu, hanya dapat diakses dan diubah pada kondisi tertentu.
-
-long CM_PER_SEC = 33145 + (61* SUHU); //rumus menentukan kecepatan suara berdasarkan suhu ruangan
+volatile int timer1_overflow = 0; //how many times that timer 1 has been overflowing
+long CM_PER_SEC = 33145 + (61* SUHU); //formula for calculating speed of sound
 
 ISR(SIG_OVERFLOW1) {
 
@@ -99,7 +111,7 @@ cm[3] = ((ultrasoundValue[3] * CM_PER_SEC) /2000000) + offset[3];
 
 void triggerpulse(){
 
-// inisiasi nilai done_PING 
+// inisiation 
 done_PING[0] = false ;
 done_PING[1] = false ;
 done_PING[2] = false ;
@@ -117,20 +129,20 @@ ofStart[1] = -1;
 ofStart[2] = -1;
 ofStart[3] = -1;
 
-// semua pinSig dijadikan output untuk trigger
+// all PIN SIGN become the output for Trigger
 pinMode(pingSig[0],OUTPUT);
 pinMode(pingSig[1],OUTPUT);
 pinMode(pingSig[2],OUTPUT);
 pinMode(pingSig[3],OUTPUT);
 
-// hold off terlebih dahulu
+// hold off 
 digitalWrite(pingSig[0], LOW);
 digitalWrite(pingSig[1], LOW);
 digitalWrite(pingSig[2], LOW);
 digitalWrite(pingSig[3], LOW);
 delayMicroseconds(2);
 
-// trigger dimulai, setelah trigger selesai dilakukan, pinSig kembali menjadi input untuk mendengarkan sinyal echo
+// Start the trigger, then change the PinSIG to become input to receive the signal 
 
 //trigger ping 0
 digitalWrite(pingSig[0], HIGH);
@@ -240,7 +252,7 @@ void readsignal()
         }
 
         
-}// akhir readsignal
+}
 
 
 void loop()
